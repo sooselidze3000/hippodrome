@@ -11,6 +11,7 @@ public class Island {
         int c = (int) (Math.random() * 80 + 20);//рандомное число для заполнения поля животными/растениями
         int animalsCount = a * b * c;
         ArrayList<ArrayList<ArrayList<? extends Animal>>> fieldArray = new ArrayList<>(); //размер одной стороны поля
+
         int type;
         // INITIALIZATION
         for (int i = 0; i < a; i++) {
