@@ -1,42 +1,45 @@
 public class Caterpillar extends Herbivore{
-    public final Types type = Types.CATERPILLAR;
-    private String moveDirection;
-    public final int maxPopulation = 1000;
-    public final double weight = 0.01;
-    public final int speed = 4;
-    public final double maxSaturation = 0;
+    private final Types type = Types.CATERPILLAR;
+    private final int maxPopulation = 1000;
+    private final double weight = 0.01;
+    private final int speed = 4;
+    private final double maxSaturation = 0;
     private double actSaturation = 0;
 
     @Override
-    public double getActSaturation() {
+    public synchronized int getMaxPopulation() {
+        return maxPopulation;
+    }
+    @Override
+    public synchronized double getActSaturation() {
         return actSaturation;
     }
 
     @Override
-    public void setActSaturation(double actSaturation) {
+    public synchronized void setActSaturation(double actSaturation) {
         this.actSaturation = actSaturation;
     }
     @Override
-    public void decreaseSaturation() {
+    public synchronized void decreaseSaturation() {
         actSaturation = actSaturation - (maxSaturation/10.0);
     }
     @Override
-    void eat(Plant plant) {
+    public synchronized void eat(Plant plant) {
         actSaturation += plant.getWeight();
         if (actSaturation > maxSaturation) {
             actSaturation = maxSaturation;
         }
     }
     @Override
-    public double getWeight() {
+    public synchronized double getWeight() {
         return weight;
     }
     @Override
-    public Types getType() {
+    public synchronized Types getType() {
         return type;
     }
     @Override
-    public int getSpeed() {
+    public synchronized int getSpeed() {
         return speed;
     }
 }

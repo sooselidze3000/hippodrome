@@ -1,6 +1,6 @@
 public abstract class ChanceToEat {
 //                                               1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16
-    public static final int[][] chanceToEat = { {0,  0,  0,  0,  0,  10, 15, 60, 80, 60, 70, 15, 10, 40,  0,  0}, //1
+    private static final int[][] chanceToEat = { {0,  0,  0,  0,  0,  10, 15, 60, 80, 60, 70, 15, 10, 40,  0,  0}, //1
                                                 {0,  0,  15, 0,  0,  0,  0,  20, 40, 0,  0,  0,  0,  10,  0,  0}, //2
                                                 {0,  0,  0,  0,  0,  0,  0,  70, 90, 0,  0,  0,  0,  60,  40, 0}, //3
                                                 {0,  80, 0,  0,  0,  40, 80, 80, 90, 70, 70, 50, 20, 10,  0,  0}, //4
@@ -17,4 +17,7 @@ public abstract class ChanceToEat {
                                                 {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,   0, 100}, //15
                                                 {0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,   0,   0}  //16
                                                 };
+    public static synchronized int getChance (int a, int b) {
+        return chanceToEat[a][b];
+    }
 }

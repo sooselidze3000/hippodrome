@@ -11,7 +11,6 @@ public class Island {
         int c = (int) (Math.random() * 80 + 20);//рандомное число для заполнения поля животными/растениями
         int animalsCount = a * b * c;
         ArrayList<ArrayList<ArrayList<? extends Animal>>> fieldArray = new ArrayList<>(); //размер одной стороны поля
-
         int type;
         // INITIALIZATION
         for (int i = 0; i < a; i++) {
@@ -19,16 +18,20 @@ public class Island {
             for (int j = 0; j < b; j++) {
                 fieldArray.get(i).add(new ArrayList<>()); //размер поля и заполнение полей
                 for (int k = 0; k < c; k++) {
-                    type = (int) (Math.random() * 14) + 1;
+                    type = ThreadLocalRandom.current().nextInt(0, 15);
                     if (k < (c / 10)) {
                         fieldArray.get(i).get(j).add(Animal.getAnimal(20)); //заполнение травой каждую ячейку на 10%
                     } else {
                         fieldArray.get(i).get(j).add(Animal.getAnimal(type));
+                        if (Animal.getAnimalCount(type) > fieldArray.get(i).get(j).get(k).getMaxPopulation()) {
+                            fieldArray.get(i).get(j).remove(fieldArray.get(i).get(j).get(k));
+                        }
                     }
                 }
             }
         }
         System.out.println("Island created size is " + a + "*" + b + "*" + c);
+//        Animal.printAnimals(fieldArray);
         class RandomEating implements Runnable {
             int getA1 = 0;
             int getA2 = 0;
@@ -42,16 +45,16 @@ public class Island {
                                         getA1 = ThreadLocalRandom.current().nextInt(0, m.size());
                                         getA2 = ThreadLocalRandom.current().nextInt(0, m.size());
                                     } // trying until both not plants and not same animal
-                                    if (ChanceToEat.chanceToEat[m.get(getA1).getType().ordinal()][m.get(getA2).getType().ordinal()] >
-                                            ChanceToEat.chanceToEat[m.get(getA2).getType().ordinal()][m.get(getA1).getType().ordinal()]) {
+                                    if (ChanceToEat.getChance(m.get(getA1).getType().ordinal(), m.get(getA2).getType().ordinal()) >
+                                            ChanceToEat.getChance(m.get(getA2).getType().ordinal(), m.get(getA1).getType().ordinal())) {
                                         if (ThreadLocalRandom.current().nextInt(0, 100) <=
-                                                ChanceToEat.chanceToEat[m.get(getA1).getType().ordinal()][m.get(getA2).getType().ordinal()]) {
+                                                ChanceToEat.getChance(m.get(getA1).getType().ordinal(), m.get(getA2).getType().ordinal())) {
                                             m.get(getA1).eat(m.remove(getA2));
                                             count++;
                                         }
                                     } else {
                                         if (ThreadLocalRandom.current().nextInt(0, 100) <=
-                                                ChanceToEat.chanceToEat[m.get(getA2).getType().ordinal()][m.get(getA1).getType().ordinal()]) {
+                                                ChanceToEat.getChance(m.get(getA2).getType().ordinal(), m.get(getA1).getType().ordinal())) {
                                             m.get(getA2).eat(m.remove(getA1));
                                             count++;
                                         }
@@ -59,7 +62,7 @@ public class Island {
                                     getA1 = 0; // reset for next field
                                     getA2 = 0; // reset for next field
                                 }));
-                System.out.println(count + " animals ate other animals");
+//                System.out.println(count + " animals ate other animals");
 //                System.out.printf("%.3f", (double) count / (double) animalsCount * 100);
 //                System.out.println("%");
                 count = 0;
@@ -87,7 +90,7 @@ public class Island {
                                         }
                                     }
                                 })); //Check if dead
-                System.out.println(count + " animals died");
+//                System.out.println(count + " animals died");
 //                System.out.print("");
 //                System.out.printf("%.3f", (double) count / (double) animalsCount * 100);
 //                System.out.println("%");
@@ -114,7 +117,7 @@ public class Island {
                         i--;
                     }
                 }
-                System.out.println(count + " plants was planted");
+//                System.out.println(count + " plants was planted");
 //                System.out.printf("%.3f", (double) count / (double) animalsCount * 100);
 //                System.out.println("%");
                 set.clear(); // clear set for next iteration
@@ -166,7 +169,7 @@ public class Island {
                                         step = 0;
                                     }
                                 }));
-                System.out.println(count + " animals moved");
+//                System.out.println(count + " animals moved");
 //                System.out.printf("%.3f", (double) count / (double) animalsCount * 100);
 //                System.out.println("%");
                 pos = 0;
@@ -194,10 +197,22 @@ public class Island {
                                     getA1 = 0; // reset for next field
                                     getA2 = 0; // reset for next field
                                 }));
-                System.out.println(count + " babies was born");
+//                System.out.println(count + " babies was born");
 //                System.out.printf("%.3f", (double) count / (double) animalsCount * 100);
 //                System.out.println("%");
                 count = 0;
+            }
+        }
+        class PrintStatus implements Runnable {
+            int iterations = 0;
+            @Override
+            public void run() {
+                try {
+                    System.out.println("Iteration " + ++iterations);
+                    Animal.printAnimals(fieldArray);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -207,5 +222,6 @@ public class Island {
         executorService.scheduleAtFixedRate(new GrowingPlants(), 10, 5000, TimeUnit.MILLISECONDS);
         executorService.scheduleAtFixedRate(new RandomAnimalMove(), 10, 5000, TimeUnit.MILLISECONDS);
         executorService.scheduleAtFixedRate(new MakingBabies(), 10, 5000, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(new PrintStatus(), 10, 5000, TimeUnit.MILLISECONDS);
     }
 }
