@@ -20,7 +20,7 @@ public class Duck extends Herbivore{
     }
     @Override
     public synchronized void decreaseSaturation() {
-        actSaturation = actSaturation - (maxSaturation/10.0);
+        actSaturation = actSaturation - (maxSaturation/10);
     }
 
     @Override

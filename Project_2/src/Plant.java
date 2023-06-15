@@ -13,4 +13,9 @@ public class Plant extends Animal{
     public synchronized Types getType() {
         return type;
     }
+    @Override
+    public synchronized void decreaseSaturation() {
+        //actSaturation = actSaturation - (maxSaturation/10.0);
+    }
+
 }

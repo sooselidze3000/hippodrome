@@ -3,13 +3,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 public class Island {
     public static void main(String[] args) {
-        int a = (int) (Math.random() * 80 + 20);// рандомное число стороны поля а
-        int b = (int) (Math.random() * 80 + 20);// рандомное число стороны поля в
-        int c = (int) (Math.random() * 80 + 20);//рандомное число для заполнения поля животными/растениями
-        int animalsCount = a * b * c;
+        int a = (int) (Math.random() * 20 + 20);// рандомное число стороны поля а
+        int b = (int) (Math.random() * 20 + 20);// рандомное число стороны поля в
+        int c = (int) (Math.random() * 130 + 20);//рандомное число для заполнения поля животными/растениями
+        int[][][] animalsCount = new int[a][b][16];
         ArrayList<ArrayList<ArrayList<? extends Animal>>> fieldArray = new ArrayList<>(); //размер одной стороны поля
         int type;
         // INITIALIZATION
@@ -20,80 +21,92 @@ public class Island {
                 for (int k = 0; k < c; k++) {
                     type = ThreadLocalRandom.current().nextInt(0, 15);
                     if (k < (c / 10)) {
-                        fieldArray.get(i).get(j).add(Animal.getAnimal(20)); //заполнение травой каждую ячейку на 10%
+                        fieldArray.get(i).get(j).add(Animal.getAnimal(15));
+                        animalsCount[i][j][15]++;//заполнение травой каждую ячейку на 10%
                     } else {
                         fieldArray.get(i).get(j).add(Animal.getAnimal(type));
-                        if (Animal.getAnimalCount(type) > fieldArray.get(i).get(j).get(k).getMaxPopulation()) {
-                            fieldArray.get(i).get(j).remove(fieldArray.get(i).get(j).get(k));
-                        }
+                        animalsCount[i][j][type]++;
                     }
                 }
             }
         }
         System.out.println("Island created size is " + a + "*" + b + "*" + c);
-//        Animal.printAnimals(fieldArray);
+//        System.out.println(fieldArray.get(0).get(0).get(16));
+//        fieldArray.get(0).get(0).remove(5);
+//        System.out.println(fieldArray.get(0).get(0).get(16));
         class RandomEating implements Runnable {
             int getA1 = 0;
             int getA2 = 0;
             int count = 0;
+
             @Override
             public void run() {
-                fieldArray
-                        .forEach(n -> n
-                                .forEach(m -> {
-                                    while (getA1 == getA2 || m.get(getA1).getType() == Types.PLANT && m.get(getA2).getType() == Types.PLANT) {
-                                        getA1 = ThreadLocalRandom.current().nextInt(0, m.size());
-                                        getA2 = ThreadLocalRandom.current().nextInt(0, m.size());
-                                    } // trying until both not plants and not same animal
-                                    if (ChanceToEat.getChance(m.get(getA1).getType().ordinal(), m.get(getA2).getType().ordinal()) >
-                                            ChanceToEat.getChance(m.get(getA2).getType().ordinal(), m.get(getA1).getType().ordinal())) {
-                                        if (ThreadLocalRandom.current().nextInt(0, 100) <=
-                                                ChanceToEat.getChance(m.get(getA1).getType().ordinal(), m.get(getA2).getType().ordinal())) {
-                                            m.get(getA1).eat(m.remove(getA2));
-                                            count++;
-                                        }
-                                    } else {
-                                        if (ThreadLocalRandom.current().nextInt(0, 100) <=
+                try {
+                    fieldArray
+                            .forEach(n -> n
+                                    .forEach(m -> {
+                                        while (getA1 == getA2 || m.get(getA1).getType() == Types.PLANT && m.get(getA2).getType() == Types.PLANT) {
+                                            getA1 = ThreadLocalRandom.current().nextInt(0, m.size());
+                                            getA2 = ThreadLocalRandom.current().nextInt(0, m.size());
+                                        } // trying until both not plants and not same animal
+                                        if (ChanceToEat.getChance(m.get(getA1).getType().ordinal(), m.get(getA2).getType().ordinal()) >
                                                 ChanceToEat.getChance(m.get(getA2).getType().ordinal(), m.get(getA1).getType().ordinal())) {
-                                            m.get(getA2).eat(m.remove(getA1));
-                                            count++;
+                                            if (ThreadLocalRandom.current().nextInt(0, 100) <=
+                                                    ChanceToEat.getChance(m.get(getA1).getType().ordinal(), m.get(getA2).getType().ordinal())) {
+                                                m.get(getA1).eat(m.remove(getA2));
+                                                count++;
+                                            }
+                                        } else {
+                                            if (ThreadLocalRandom.current().nextInt(0, 100) <=
+                                                    ChanceToEat.getChance(m.get(getA2).getType().ordinal(), m.get(getA1).getType().ordinal())) {
+                                                m.get(getA2).eat(m.remove(getA1));
+                                                count++;
+                                            }
                                         }
-                                    }
-                                    getA1 = 0; // reset for next field
-                                    getA2 = 0; // reset for next field
-                                }));
-//                System.out.println(count + " animals ate other animals");
-//                System.out.printf("%.3f", (double) count / (double) animalsCount * 100);
-//                System.out.println("%");
+                                        getA1 = 0; // reset for next field
+                                        getA2 = 0; // reset for next field
+                                    }));
+                } catch (Exception e) {
+                    System.out.println("Exception in eating ");
+                    e.printStackTrace();
+                }
+
                 count = 0;
             }
         }
         class AllAnimalsSlowlyDying implements Runnable {
             int count = 0;
+
             @Override
             public void run() {
-                fieldArray
-                        .forEach(n -> n
-                                .forEach(m -> m
-                                        .forEach(k -> {
-                                            if (k.getType() != Types.PLANT) {
-                                                k.decreaseSaturation();
-                                            }
-                                        }))); // slowly animals dying
-                fieldArray
-                        .forEach(n -> n
-                                .forEach(m -> {
-                                    for (int i = m.size() - 1; i >= 0; i--) {
-                                        if (m.get(i).getActSaturation() <= 0 && m.get(i).getType() != Types.PLANT) {
-                                            m.remove(i);
-                                            count++;
+                try {
+                    fieldArray
+                            .forEach(n -> n
+                                    .forEach(m -> {
+                                        for (int i = m.size() - 1; i >= 0; i--) {
+                                            m.get(i).decreaseSaturation();
                                         }
-                                    }
-                                })); //Check if dead
-//                System.out.println(count + " animals died");
-//                System.out.print("");
-//                System.out.printf("%.3f", (double) count / (double) animalsCount * 100);
-//                System.out.println("%");
+                                    })); // slowly animals dying
+                } catch (Exception e) {
+                    System.out.println("Exception in health decrease ");
+                    e.printStackTrace();
+                }
+
+                try {
+                    fieldArray
+                            .forEach(n -> n
+                                    .forEach(m -> {
+                                        for (int i = m.size() - 1; i >= 0; i--) {
+                                            if (m.get(i).getActSaturation() <= 0.0000001 && m.get(i).getType() != Types.PLANT) {
+                                                animalsCount[fieldArray.indexOf(n)][n.indexOf(m)][m.remove(i).getType().ordinal()]--;
+                                                count++;
+                                            }
+                                        }
+                                    })); //Check if dead
+                } catch (Exception e) {
+                    System.out.println("Exception in killing animals ");
+                    e.printStackTrace();
+                }
                 count = 0;
             }
         }
@@ -111,15 +124,12 @@ public class Island {
                     b = ThreadLocalRandom.current().nextInt(0, fieldArray.get(a).size());
                     if (!set.contains(a + "" + b)) {
                         set.add(a + "" + b); // to not repeat field
-                        fieldArray.get(a).get(b).add(Animal.getAnimal(20)); // planting plant
+                        fieldArray.get(a).get(b).add(0, Animal.getAnimal(15)); // planting plant
                         count++;
                     } else {
                         i--;
                     }
                 }
-//                System.out.println(count + " plants was planted");
-//                System.out.printf("%.3f", (double) count / (double) animalsCount * 100);
-//                System.out.println("%");
                 set.clear(); // clear set for next iteration
                 count = 0;
             }
@@ -169,9 +179,6 @@ public class Island {
                                         step = 0;
                                     }
                                 }));
-//                System.out.println(count + " animals moved");
-//                System.out.printf("%.3f", (double) count / (double) animalsCount * 100);
-//                System.out.println("%");
                 pos = 0;
                 count = 0;
             }
@@ -183,45 +190,89 @@ public class Island {
 
             @Override
             public void run() {
-                fieldArray
-                        .forEach(n -> n
-                                .forEach(m -> {
-                                    while (getA1 != getA2 || m.get(getA1).getType() == Types.PLANT && m.get(getA2).getType() == Types.PLANT) {
-                                        getA1 = ThreadLocalRandom.current().nextInt(0, m.size());
-                                        getA2 = ThreadLocalRandom.current().nextInt(0, m.size());
-                                    } // trying until both not plants and same animal
-                                    if (m.get(getA1).getType() == m.get(getA2).getType()) {
-                                        m.add(Animal.getAnimal(m.get(getA2).getType().ordinal() + 1));
-                                        count++;
-                                    }
-                                    getA1 = 0; // reset for next field
-                                    getA2 = 0; // reset for next field
-                                }));
+                try {
+                    fieldArray
+                            .forEach(n -> n
+                                    .forEach(m -> {
+                                        while (getA1 != getA2 || m.get(getA1).getType() == Types.PLANT && m.get(getA2).getType() == Types.PLANT) {
+                                            getA1 = ThreadLocalRandom.current().nextInt(0, m.size());
+                                            getA2 = ThreadLocalRandom.current().nextInt(0, m.size());
+                                        } // trying until both not plants and same animal
+                                        if (m.get(getA1).getType() == m.get(getA2).getType()) {
+                                            m.add(Animal.getAnimal(m.get(getA2).getType().ordinal()));
+                                            count++;
+                                        }
+                                        getA1 = 0; // reset for next field
+                                        getA2 = 0; // reset for next field
+                                    }));
 //                System.out.println(count + " babies was born");
-//                System.out.printf("%.3f", (double) count / (double) animalsCount * 100);
-//                System.out.println("%");
+                } catch (Exception e) {
+                    System.out.println("Exception in making babies ");
+                    e.printStackTrace();
+                }
                 count = 0;
             }
         }
         class PrintStatus implements Runnable {
             int iterations = 0;
+            int rand1 = 0;
+            int rand2 = 0;
+            Animal animal;
+
             @Override
             public void run() {
-                try {
-                    System.out.println("Iteration " + ++iterations);
-                    Animal.printAnimals(fieldArray);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                System.out.println("Iteration " + ++iterations);
+//                rand1 = ThreadLocalRandom.current().nextInt(0,animalsCount.length);
+//                rand2 = ThreadLocalRandom.current().nextInt(0,animalsCount[rand1].length);
+//                System.out.println("Animals count on field x" + rand1 + " y" + rand2 + " is :");
+//                System.out.println("Wolves count " + animalsCount[rand1][rand2][0]);
+//                System.out.println("Boas count " + animalsCount[rand1][rand2][1]);
+//                System.out.println("Foxes count " + animalsCount[rand1][rand2][2]);
+//                System.out.println("Bears count " + animalsCount[rand1][rand2][3]);
+//                System.out.println("Eagles count " + animalsCount[rand1][rand2][4]);
+//                System.out.println("Horses count " + animalsCount[rand1][rand2][5]);
+//                System.out.println("Deer count " + animalsCount[rand1][rand2][6]);
+//                System.out.println("Rabbits count " + animalsCount[rand1][rand2][7]);
+//                System.out.println("Mouses count " + animalsCount[rand1][rand2][8]);
+//                System.out.println("Goats count " + animalsCount[rand1][rand2][9]);
+//                System.out.println("Sheep count " + animalsCount[rand1][rand2][10]);
+//                System.out.println("Boars count " + animalsCount[rand1][rand2][11]);
+//                System.out.println("Buffalo count " + animalsCount[rand1][rand2][12]);
+//                System.out.println("Ducks count " + animalsCount[rand1][rand2][13]);
+//                System.out.println("Caterpillars count " + animalsCount[rand1][rand2][14]);
+//                System.out.println("Plants count " + animalsCount[rand1][rand2][15]);
+            }
+        }
+        class CheckEnd implements Runnable {
+            int totalAnimalsCount = 0;
+
+            @Override
+            public void run() {
+                for (int i = 0; i < animalsCount.length; i++) {
+                    for (int j = 0; j < animalsCount[i].length; j++) {
+                        for (int k = 0; k < (animalsCount[i][j].length - 1); k++) {
+                            totalAnimalsCount += animalsCount[i][j][k];
+                        }
+                    }
+                }
+                if (totalAnimalsCount <= 0) {
+                    System.out.println("SIMULATION IS FINISHED ALL ANIMALS DEAD");
+                    totalAnimalsCount = 0;
+                } else {
+                    System.out.println("Total animals count is " + totalAnimalsCount);
+                    totalAnimalsCount = 0;
                 }
             }
         }
-
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(7);
-        executorService.scheduleAtFixedRate(new RandomEating(), 0, 5000, TimeUnit.MILLISECONDS);
-        executorService.scheduleAtFixedRate(new AllAnimalsSlowlyDying(), 10, 5000, TimeUnit.MILLISECONDS);
-        executorService.scheduleAtFixedRate(new GrowingPlants(), 10, 5000, TimeUnit.MILLISECONDS);
-        executorService.scheduleAtFixedRate(new RandomAnimalMove(), 10, 5000, TimeUnit.MILLISECONDS);
-        executorService.scheduleAtFixedRate(new MakingBabies(), 10, 5000, TimeUnit.MILLISECONDS);
-        executorService.scheduleAtFixedRate(new PrintStatus(), 10, 5000, TimeUnit.MILLISECONDS);
+        final int msTime = 100;
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(5);
+        ScheduledExecutorService executorService1 = Executors.newScheduledThreadPool(1);
+//        executorService1.scheduleAtFixedRate(new RandomEating(), 10, msTime, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(new AllAnimalsSlowlyDying(), 10, msTime, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(new GrowingPlants(), 10, msTime, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(new RandomAnimalMove(), 10, msTime, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(new MakingBabies(), 10, msTime, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(new PrintStatus(), 10, msTime, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(new CheckEnd(), 10, msTime, TimeUnit.MILLISECONDS);
     }
 }

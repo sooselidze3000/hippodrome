@@ -21,13 +21,13 @@ public class Buffalo extends Herbivore{
     @Override
     public synchronized void decreaseSaturation() {
         actSaturation = actSaturation - (maxSaturation/10.0);
+        if (actSaturation < 0.0001) {
+            actSaturation = 0;
+        }
     }
     @Override
     public synchronized void eat(Plant plant) {
         actSaturation += plant.getWeight();
-        if (actSaturation > maxSaturation) {
-            actSaturation = maxSaturation;
-        }
     }
     @Override
     public synchronized double getWeight() {

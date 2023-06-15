@@ -20,7 +20,7 @@ public class Boa extends Predator {
     }
     @Override
     public synchronized void decreaseSaturation() {
-        actSaturation = actSaturation - (maxSaturation/10.0);
+        actSaturation = actSaturation - (maxSaturation/10);
     }
     @Override
     public synchronized <T extends Animal> void eat(T animal) {
