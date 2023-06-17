@@ -4,7 +4,7 @@ public class Mouse extends Herbivore {
     private final double weight = 0.05;
     private final int speed = 1;
     private final double maxSaturation = 0.01;
-    private double actSaturation = 0.01;
+    private volatile double actSaturation = 0.01;
     @Override
     public synchronized int getMaxPopulation() {
         return maxPopulation;

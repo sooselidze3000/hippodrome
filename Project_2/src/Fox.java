@@ -4,7 +4,7 @@ public class Fox extends Predator{
     private final double weight = 8.0;
     private final int speed = 2;
     private final double maxSaturation = 2;
-    private double actSaturation = 2;
+    private volatile double actSaturation = 2;
     @Override
     public synchronized int getMaxPopulation() {
         return maxPopulation;
@@ -21,9 +21,6 @@ public class Fox extends Predator{
     @Override
     public synchronized void decreaseSaturation() {
         actSaturation = actSaturation - (maxSaturation/10);
-        if (actSaturation < 0.0001) {
-            actSaturation = 0;
-        }
     }
     @Override
     public synchronized <T extends Animal> void eat(T animal) {

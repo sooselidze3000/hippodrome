@@ -4,7 +4,7 @@ public class Duck extends Herbivore{
     private final double weight = 1.0;
     private final int speed = 4;
     private final double maxSaturation = 0.15;
-    private double actSaturation = 0.15;
+    private volatile double actSaturation = 0.15;
     @Override
     public synchronized int getMaxPopulation() {
         return maxPopulation;

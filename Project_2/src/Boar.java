@@ -4,7 +4,7 @@ public class Boar extends Herbivore{
     private final double weight = 400.0;
     private final int speed = 2;
     private final double maxSaturation = 50;
-    private double actSaturation = 50;
+    private volatile double actSaturation = 50;
     @Override
     public synchronized int getMaxPopulation() {
         return maxPopulation;

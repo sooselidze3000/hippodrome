@@ -4,7 +4,7 @@ public class Boa extends Predator {
     private final double weight = 15.0;
     private final int speed = 1;
     private final double maxSaturation = 3;
-    private double actSaturation = 3;
+    private volatile double actSaturation = 3;
     @Override
     public synchronized int getMaxPopulation() {
         return maxPopulation;

@@ -4,7 +4,7 @@ public class Buffalo extends Herbivore{
     private final double weight = 700.0;
     private final int speed = 3;
     private final double maxSaturation = 100;
-    private double actSaturation = 100;
+    private volatile double actSaturation = 100;
     @Override
     public synchronized int getMaxPopulation() {
         return maxPopulation;
@@ -21,9 +21,6 @@ public class Buffalo extends Herbivore{
     @Override
     public synchronized void decreaseSaturation() {
         actSaturation = actSaturation - (maxSaturation/10.0);
-        if (actSaturation < 0.0001) {
-            actSaturation = 0;
-        }
     }
     @Override
     public synchronized void eat(Plant plant) {

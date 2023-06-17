@@ -4,7 +4,7 @@ public class Eagle extends Predator{
     private final double weight = 6.0;
     private final int speed = 3;
     private final double maxSaturation = 1;
-    private double actSaturation = 1;
+    private volatile double actSaturation = 1;
     @Override
     public synchronized int getMaxPopulation() {
         return maxPopulation;

@@ -4,7 +4,7 @@ public class Wolf extends Predator {
     private final double weight = 50.0;
     private final int speed = 3;
     private final double maxSaturation = 8;
-    private double actSaturation = 8;
+    private volatile double actSaturation = 8;
     @Override
     public synchronized int getMaxPopulation() {
         return maxPopulation;

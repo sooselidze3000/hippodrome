@@ -4,7 +4,7 @@ public class Rabbit extends Herbivore{
     private final double weight = 2.0;
     private final int speed = 2;
     private final double maxSaturation = 0.45;
-    private double actSaturation = 0.45;
+    private volatile double actSaturation = 0.45;
     @Override
     public synchronized int getMaxPopulation() {
         return maxPopulation;

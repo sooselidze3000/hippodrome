@@ -4,7 +4,7 @@ public class Goat extends Herbivore{
     private final double weight = 60.0;
     private final int speed = 3;
     private final double maxSaturation = 10;
-    private double actSaturation = 10;
+    private volatile double actSaturation = 10;
     @Override
     public synchronized int getMaxPopulation() {
         return maxPopulation;
