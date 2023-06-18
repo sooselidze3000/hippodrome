@@ -3,8 +3,8 @@ public class Caterpillar extends Herbivore{
     private final int maxPopulation = 1000;
     private final double weight = 0.01;
     private final int speed = 4;
-    private final double maxSaturation = 0;
-    private volatile double actSaturation = 0;
+    private final double maxSaturation = 0.0001;
+    private volatile double actSaturation = 0.0001;
 
     @Override
     public synchronized int getMaxPopulation() {
