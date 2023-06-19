@@ -191,7 +191,10 @@ public class Island {
                                     if (m.size() > 0) {
                                         getA1 = ThreadLocalRandom.current().nextInt(0, m.size());
                                         getA2 = ThreadLocalRandom.current().nextInt(0, m.size());
-                                        if (m.get(getA1).getType() == m.get(getA2).getType() && m.get(getA1).getType() != Types.PLANT && m.get(getA2).getType() != Types.PLANT) {
+                                        if (m.get(getA1).getType() == m.get(getA2).getType()
+                                                && m.get(getA1).getType() != Types.PLANT && m.get(getA2).getType() != Types.PLANT
+                                                && getA1 != getA2
+                                                && animalsCount[fieldArray.indexOf(n)][n.indexOf(m)][m.get(getA1).getType().ordinal()] < m.get(getA1).getMaxPopulation()) {
                                             m.add(Animal.getAnimal(m.get(getA2).getType().ordinal()));
                                             animalsCount[fieldArray.indexOf(n)][n.indexOf(m)][m.get(getA1).getType().ordinal()]++;
                                             count++;
@@ -252,11 +255,14 @@ public class Island {
             for (int j = 0; j < b; j++) {
                 fieldArray.get(i).add(new ArrayList<>()); //размер поля и заполнение полей
                 for (int k = 0; k < c; k++) {
-                    type = ThreadLocalRandom.current().nextInt(0, 15);
                     if (k < (c / 10)) {
                         fieldArray.get(i).get(j).add(Animal.getAnimal(15));
                         animalsCount[i][j][15]++;//заполнение травой каждую ячейку на 10%
                     } else {
+                        type = ThreadLocalRandom.current().nextInt(0, 15);
+                        while (animalsCount[i][j][type] >= Animal.getAnimal(type).getMaxPopulation()) {
+                            type = ThreadLocalRandom.current().nextInt(0, 15);
+                        } // проверка перенаселения
                         fieldArray.get(i).get(j).add(Animal.getAnimal(type));
                         animalsCount[i][j][type]++;//заполнение животными
                     }
