@@ -140,27 +140,38 @@ public class Island {
                                                 }
                                                 direction = Animal.getMoveDirection();
                                                 if (step > 0) {
-                                                    count++;
                                                     if (direction.equalsIgnoreCase("down")) {
                                                         pos = fieldArray.indexOf(n) + step;
                                                         if (pos >= fieldArray.size())
                                                             pos = fieldArray.size() - 1;
-                                                        fieldArray.get(pos).get(n.indexOf(m)).add(Animal.converter(m.remove(i)));
+                                                        if (animalsCount[pos][n.indexOf(m)][m.get(i).getType().ordinal()] < m.get(i).getMaxPopulation()) {
+                                                            fieldArray.get(pos).get(n.indexOf(m)).add(Animal.converter(m.remove(i)));
+                                                            count++;
+                                                        }
                                                     } else if (direction.equalsIgnoreCase("up")) {
                                                         pos = fieldArray.indexOf(n) - step;
                                                         if (pos < 0)
                                                             pos = 0;
-                                                        fieldArray.get(pos).get(n.indexOf(m)).add(Animal.converter(m.remove(i)));
+                                                        if (animalsCount[pos][n.indexOf(m)][m.get(i).getType().ordinal()] < m.get(i).getMaxPopulation()) {
+                                                            fieldArray.get(pos).get(n.indexOf(m)).add(Animal.converter(m.remove(i)));
+                                                            count++;
+                                                        }
                                                     } else if (direction.equalsIgnoreCase("left")) {
                                                         pos = n.indexOf(m) - step;
                                                         if (pos < 0)
                                                             pos = 0;
-                                                        n.get(pos).add(Animal.converter(m.remove(i)));
+                                                        if (animalsCount[fieldArray.indexOf(n)][pos][m.get(i).getType().ordinal()] < m.get(i).getMaxPopulation()) {
+                                                            n.get(pos).add(Animal.converter(m.remove(i)));
+                                                            count++;
+                                                        }
                                                     } else if (direction.equalsIgnoreCase("right")) {
                                                         pos = n.indexOf(m) + step;
                                                         if (pos >= n.size())
                                                             pos = n.size() - 1;
-                                                        n.get(pos).add(Animal.converter(m.remove(i)));
+                                                        if (animalsCount[fieldArray.indexOf(n)][pos][m.get(i).getType().ordinal()] < m.get(i).getMaxPopulation()) {
+                                                            n.get(pos).add(Animal.converter(m.remove(i)));
+                                                            count++;
+                                                        }
                                                     }
                                                 }
                                             }
