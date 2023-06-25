@@ -1,6 +1,5 @@
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Stream;
 
 public class Island {
     static int a = (int) (Math.random() * 20 + 20);// рандомное число стороны поля а

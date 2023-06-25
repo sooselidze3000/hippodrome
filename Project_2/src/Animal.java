@@ -1,17 +1,16 @@
 import java.util.ArrayList;
 
 public abstract class Animal {
-    static int count = 0;
+    static int count;
     private Types type;
-    private final int maxPopulation = -1;
-    private final double weight = -1;
-    private final int speed = -1;
-    protected final double maxSaturation = -1;
-    protected double actSaturation = -1;
+    private int maxPopulation;
+    private double weight;
+    private int speed;
+    protected double maxSaturation;
+    protected double actSaturation;
     public int getSpeed() {
         return speed;
     }
-
     public Types getType() {
         return type;
     }
